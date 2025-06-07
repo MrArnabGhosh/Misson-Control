@@ -19,4 +19,5 @@ const taskSchema = new Schema({
     progress:{type:Number,default:0},
 },{timestamps:true}
 )
-export const task = mongoose.model("Task",taskSchema )
+ const Task = mongoose.model("Task",taskSchema )
+ export default Task
