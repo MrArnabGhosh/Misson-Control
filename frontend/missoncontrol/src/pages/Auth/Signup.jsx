@@ -1,9 +1,13 @@
-import  { useState } from "react";
+import  { useContext, useState } from "react";
 import AuthLayout from "../../components/layouts/AuthLayout.jsx";
 import { validateEmail } from "../../utils/helper.js";
 import ProfilePhotoSelector from "../../components/inputs/ProfilePhotoSelector";
 import Input from "../../components/inputs/Input.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/axiosInstance.js";
+import { API_PATHS } from "../../utils/apiPaths.js";
+import { UserContext } from "../../context/userContext.jsx";
+import uploadImage from "../../utils/uploadImage.js";
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
@@ -12,9 +16,14 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [adminInviteToken, setAdminInviteToken] = useState("");
   const [error, setError] = useState(null);
+  const navigate = useNavigate()
+  const {updateUser} = useContext(UserContext)
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
+
+    let profileImageUrl=''
+
     if(!fullName){
       setError("Please Enter full name.")
       return
@@ -29,6 +38,36 @@ const SignUp = () => {
     }
     setError("")
     // Add your sign-up logic here
+    try {
+        if(profilePic){
+          const imgUploadRes = await uploadImage(profilePic)
+          profileImageUrl = imgUploadRes.imageUrl || ""
+        }
+
+        const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER,{
+          name: fullName,
+          email,
+          password,
+          profileImageUrl,
+          adminInviteToken,      
+        })
+        const { token,role }=response.data
+        if(token){
+          localStorage.setItem("token",token)
+          updateUser(response.data)
+        }
+        if(role==="admin"){
+          navigate("/admin/dashboard")
+        }else{
+          navigate("/user/dashboard")
+        }
+      } catch (error) {
+        if(error.response && error.response.data.message){
+          setError(error.response.data.message)
+        }else{
+          setError("Something went wrong. Please try again.")
+        }
+      }
   };
 
   return (
