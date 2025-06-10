@@ -1,14 +1,17 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import AuthLayout from '../../components/layouts/AuthLayout'
 import {Link, useNavigate} from "react-router-dom"
 import Input from '../../components/inputs/Input'
 import { validateEmail } from '../../utils/helper'
+import axiosInstance from '../../utils/axiosInstance'
+import { API_PATHS } from '../../utils/apiPaths'
+import { UserContext } from '../../context/userContext'
 const Login = () => {
     const [email, setemail] = useState("")
     const [password, setpassword] = useState("")
     const [error, seterror] = useState(null)
     const navigate = useNavigate()
-
+  const {updateUser} = useContext(UserContext)
     const handelLogin = async (e)=>{ 
       e.preventDefault()
       if(!validateEmail(email)){
@@ -22,6 +25,28 @@ const Login = () => {
       seterror("")
 
       //login api call
+      try {
+        const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN,{
+          email,
+          password,
+        })
+        const { token,role }=response.data
+        if(token){
+          localStorage.setItem("token",token)
+          updateUser(response.data)
+        }
+        if(role==="admin"){
+          navigate("/admin/dashboard")
+        }else{
+          navigate("/user/dashboard")
+        }
+      } catch (error) {
+        if(error.response && error.response.data.message){
+          seterror(error.response.data.message)
+        }else{
+          seterror("Something went wrong. Please try again.")
+        }
+      }
     }
   return (
     <AuthLayout>
