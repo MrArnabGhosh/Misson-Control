@@ -9,7 +9,7 @@ const Login = () => {
     const [error, seterror] = useState(null)
     const navigate = useNavigate()
 
-    const handelLogin = async (e)=>{
+    const handelLogin = async (e)=>{ 
       e.preventDefault()
       if(!validateEmail(email)){
         seterror("Please enter a valid Email address.")
@@ -34,14 +34,14 @@ const Login = () => {
             value={email}
             onChange={({target})=>setemail(target.value)}
             label="Email Address"
-            palceholder ="arnab@example.com"
+            placeholder ="arnab@example.com"
             type="text"
           />
           <Input
             value={password}
             onChange={({target})=>setpassword(target.value)}
             label="Password"
-            palceholder ="Min 8 characters"
+            placeholder ="Min 8 characters"
             type="password"
           />
           {error && <p className='text-red-500 text-xs pb-2.5'>{error}</p>}
