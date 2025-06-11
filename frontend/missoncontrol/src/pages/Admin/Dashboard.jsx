@@ -6,6 +6,11 @@ import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import moment from 'moment'
+import InfoCard from '../../components/cards/InfoCard'
+import { addThoudsandsSeparator } from '../../utils/helper'
+import { LuArrowRight } from 'react-icons/lu'
+import TaskListTable from '../../components/layouts/TaskListTable'
 
 const Dashboard = () => {
   useUserAuth()
@@ -26,24 +31,76 @@ const Dashboard = () => {
       console.error("Error fetching users",error)
     }
   }
+  const onSeeMore= ()=>{
+    navigate('/admin/tasks')
+  }
 
-  useEffect(() => {
-    getDashboardData()
-  
-    return () => {}
-  }, [])
   
 
 
   return (
     <DashboardLayout activeMenu="Dashboard">
-      <div className="flex">
+      <div className="card my-5">
         <div>
-          <div className="flex">
-            <h2 className=''> Good Morning {user.name} </h2>
-            <p className=''></p>
+          <div className="col-span-3">
+            <h2 className='text-xl md:text-2xl'> Good Morning {user?.name} </h2>
+            <p className='text-xs md:text-[13px] text-gray-400 mt-1.5'>
+              {moment().format("dddd Do MMM YYYY")}
+            </p>
           </div>
         </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-5">
+            <InfoCard
+              label="Total Tasks"
+              value={addThoudsandsSeparator(
+                dashboardData?.charts?.taskDistribution?.All || 0
+              )}
+              color="bg-primary"
+              />
+
+              <InfoCard
+              label="Pending Tasks"
+              value={addThoudsandsSeparator(
+                dashboardData?.charts?.taskDistribution?.Pending || 0
+              )}
+              color="bg-violet-500"
+              />
+
+              <InfoCard
+              label="In Progress Tasks"
+              value={addThoudsandsSeparator(
+                dashboardData?.charts?.taskDistribution?.InProgress || 0
+              )}
+              color="bg-cyan-500"
+              />
+
+              <InfoCard
+              label="Completed Tasks"
+              value={addThoudsandsSeparator(
+                dashboardData?.charts?.taskDistribution?.Completed || 0
+              )}
+              color="bg-lime-500"
+              />
+        </div>
+      </div>
+      <div className="grid grid-col-1 md:grid-cols-2 gap-6 my-4 md:my-6 ">
+              <div className="md:col-span-2">
+                  <div className="card">
+                    <div className="flex items-center justify-between">
+                        <h5 className='text-lg'>
+                            Recent Tasks
+                        </h5>
+                        <button
+                        className='card-btn'
+                         onClick={onSeeMore}>
+                         See All <LuArrowRight className='text-base cursor-pointer' />
+
+                        </button>
+                    </div>
+                    <TaskListTable tableData={dashboardData?.recentTasks || []} />
+                  </div>
+              </div>
+
       </div>
     </DashboardLayout>
   )
