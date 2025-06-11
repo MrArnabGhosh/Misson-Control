@@ -43,13 +43,39 @@ const App = () => {
   )
 };
 
-export default App;
 
-const Root = ()=>{
-  const {user,loading} = useContext(UserContext)
-  if(loading) return <Outlet />
-  if(!user){
-    return <Navigate to="/login" />
+const Root = () => {
+  const { user, loading } = useContext(UserContext);
+
+  // 1. If still loading the authentication status:
+  //    Display a loading message or spinner. Do NOT render the protected content yet.
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          fontSize: "20px",
+          color: "#333",
+        }}
+      >
+        Initializing application...
+      </div>
+    );
   }
-  return user.role ==="admin" ? <Navigate to="/admin/dashboard" /> : <Navigate to="/user/dashboard" />
-}
+
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return user.role === "admin" ? (
+    <Navigate to="/admin/dashboard" replace />
+  ) : (
+    <Navigate to="/user/dashboard" replace />
+  );
+};
+
+export default App;
