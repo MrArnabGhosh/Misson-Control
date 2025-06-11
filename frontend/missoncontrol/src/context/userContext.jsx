@@ -23,28 +23,32 @@ const UserProvider = ({ children }) => {
         setUser(response.data);
       } catch (error) {
         console.error("User not authenticated", error);
-      } finally {
-        setLoading(false); // Ensure loading is set to false after fetch attempt
-      }
+        clearUser();
+      }finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUser();
+}, []);
+
+const updateUser = (userData) => {
+  setUser(userData);
+  localStorage.setItem("token", userData.token);
+  setLoading(false);
+};
+
+const clearUser = () => {
+  setUser(null);
+  localStorage.removeItem("token");
+};
+
+return (
+  <UserContext.Provider value={{ user, loading, updateUser, clearUser }}>
+    {children}
+  </UserContext.Provider>
+);
     };
 
-    fetchUser();
-  }, []); // Dependency array includes 'user' to re-run if user becomes null later
-
-    const updateUser = (userData)=>{
-        setUser(userData)
-        localStorage.setItem("token",userData.token)
-        setLoading(false)
-    }
-    const clearUser = ()=>{
-        setUser(null)
-        localStorage.removeItem("token")
-    }
-    return (
-    <UserContext.Provider value={{ user,updateUser,clearUser, loading }}>
-      {children}
-    </UserContext.Provider>
-  );
-};
 
 export default UserProvider;

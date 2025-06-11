@@ -46,8 +46,8 @@ const App = () => {
 export default App;
 
 const Root = ()=>{
-  const {user,loding} = useContext(UserContext)
-  if(loding) return <Outlet />
+  const {user,loading} = useContext(UserContext)
+  if(loading) return <Outlet />
   if(!user){
     return <Navigate to="/login" />
   }
